@@ -2,11 +2,22 @@
 const express = require('express');
 // Bring Handlebars Module
 const exphbs  = require('express-handlebars');
+// Mongoose Module
+const mongoose = require('mongoose');
 
 // Initialize the application
 const app = express();
 
+// Connect to mongoose
+// Starting with just local DB
+mongoose.connect('mongodb://localhost/express-dev')
+.then(()=>{console.log('MongoDB Connected...')})
+.catch(err => console.log(err));
 
+// Load Idea Model
+require('./models/Idea');
+// Load the model into a variable with the name of the model
+const Idea = mongoose.model('ideas');
 
 // Handelbars Middleware
 app.engine('handlebars', exphbs({
