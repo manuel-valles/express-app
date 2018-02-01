@@ -41,6 +41,11 @@ app.get('/about', (req, res)=>{
 	res.render('about');
 });
 
+// Add Idea Form - Route
+app.get('/ideas/add', (req, res)=>{
+	res.render('ideas/add');
+});
+
 // Port Varibale
 const port = 5000;
 
