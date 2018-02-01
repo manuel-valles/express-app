@@ -1,29 +1,33 @@
 // Bring Express Module
 const express = require('express');
+// Bring Handlebars Module
+const exphbs  = require('express-handlebars');
+
 // Initialize the application
 const app = express();
 
 
-// How Middleware works
-app.use((req, res, next)=>{
-	// Log the TimeStamp every time we refresh the page
-	console.log(Date.now());
-	// Set a request variable that I can access through the application
-	req.name = 'Manu';
-	next();
-});
 
+// Handelbars Middleware
+app.engine('handlebars', exphbs({
+	defaultLayout: 'main'
+}));
+app.set('view engine', 'handlebars');
 
 // Index Route - Get request
 app.get('/', (req, res)=>{
-	console.log(req.name);
+	// Dynamic Data that will pass as a second parameter
+	const title = 'Welcome to an Express App';
 	// Send method - send sth to the browser
-	res.send('INDEX');
+	res.render('index', {
+		// title: title
+		title
+	});
 });
 
 // About Route
 app.get('/about', (req, res)=>{
-	res.send('ABOUT');
+	res.render('about');
 });
 
 // Port Varibale
