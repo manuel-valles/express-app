@@ -114,7 +114,7 @@ app.post('/ideas', (req, res)=>{
 	}
 });
 
-// Edit Form Process
+// Edit Idea Form Process
 app.put('/ideas/:id', (req, res)=>{
 	Idea.findOne({
 		_id: req.params.id
@@ -129,6 +129,14 @@ app.put('/ideas/:id', (req, res)=>{
 				res.redirect('/ideas');
 			});
 	})
+});
+
+// Delete Idea 
+app.delete('/ideas/:id', (req, res)=>{
+	Idea.remove({_id: req.params.id})
+		.then(()=>{
+			res.redirect('/ideas');
+		});
 });
 
 // Port Varibale
