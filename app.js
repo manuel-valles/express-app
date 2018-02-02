@@ -1,5 +1,8 @@
 // Bring Express Module
 const express = require('express');
+// Bring Path Module - No installation needed (Core JS Module)
+// To do things with paths, like join them
+const path = require('path');
 // Bring Handlebars Module
 const exphbs  = require('express-handlebars');
 // Body Parser Module
@@ -27,6 +30,9 @@ mongoose.connect('mongodb://localhost/express-dev')
 .then(()=>{console.log('MongoDB Connected...')})
 .catch(err => console.log(err));
 
+// Static folder - Middleware
+// Make public folder the static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Handelbars Middleware
 app.engine('handlebars', exphbs({
