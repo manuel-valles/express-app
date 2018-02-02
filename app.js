@@ -17,16 +17,16 @@ const mongoose = require('mongoose');
 // Initialize the application
 const app = express();
 
+// Load Routes
+const ideas = require('./routes/ideas');
+const users = require('./routes/users');
+
 // Connect to mongoose
 // Starting with just local DB
 mongoose.connect('mongodb://localhost/express-dev')
 .then(()=>{console.log('MongoDB Connected...')})
 .catch(err => console.log(err));
 
-// Load Idea Model
-require('./models/Idea');
-// Load the model into a variable with the name of the model
-const Idea = mongoose.model('ideas');
 
 // Handelbars Middleware
 app.engine('handlebars', exphbs({
@@ -75,94 +75,11 @@ app.get('/about', (req, res)=>{
 	res.render('about');
 });
 
-// Idea Index Route
-app.get('/ideas', (req, res)=>{
-	Idea.find({})
-		.sort({date: 'desc'})
-		.then(ideas=>{
-			res.render('ideas/index', {
-				ideas: ideas
-			});
-		});
-})
 
-// Add Idea Form - Route
-app.get('/ideas/add', (req, res)=>{
-	res.render('ideas/add');
-});
-
-// Edit Idea Form - Route
-app.get('/ideas/edit/:id', (req, res)=>{
-	Idea.findOne({
-		_id: req.params.id
-	})
-	.then(idea=>{
-		res.render('ideas/edit', {
-			idea: idea
-		});
-	});
-	
-});
-
-// Process Form
-app.post('/ideas', (req, res)=>{
-	// Validation
-	let errors = [];
-
-	if(!req.body.title){
-		errors.push({text: 'Please add a title'});
-	}
-	if(!req.body.details){
-		errors.push({text: 'Please add some details'});
-	}
-
-	if(errors.length>0){
-		res.render('ideas/add', {
-			errors: errors,
-			title: req.body.title,
-			details: req.body.details
-		});
-	} else{
-		const newUser = {
-			title: req.body.title,
-			details: req.body.details
-		}
-		new Idea(newUser)
-			.save()
-			.then(idea=>{
-				req.flash('success_msg', 'Video idea added');
-				res.redirect('ideas');
-			});
-	}
-});
-
-// Edit Idea Form Process
-app.put('/ideas/:id', (req, res)=>{
-	Idea.findOne({
-		_id: req.params.id
-	})
-	.then(idea=>{
-		// new values
-		idea.title = req.body.title;
-		idea.details = req.body.details;
-		// save these new values
-		idea.save()
-			.then(idea=>{
-				req.flash('success_msg', 'Video idea updated');
-				res.redirect('/ideas');
-			});
-	})
-});
-
-// Delete Idea 
-app.delete('/ideas/:id', (req, res)=>{
-	Idea.remove({_id: req.params.id})
-		.then(()=>{
-			// Add message
-			req.flash('success_msg', 'Video idea removed');
-			res.redirect('/ideas');
-		});
-});
+// Use Routes
+//(Route, File)
+app.use('/ideas', ideas);
+app.use('/users', users);
 
 // Port Varibale
 const port = 5000;
