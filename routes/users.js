@@ -1,10 +1,13 @@
-// Bring Express
+// Bring Modules
 const express = require('express');
-// Bring the Router from Express
 const router = express.Router();
-// Mongoose Module
+const bcrypt = require('bcryptjs');
+// const passport = require('passport');
 const mongoose = require('mongoose');
 
+// Load User Model
+require('../models/User');
+const User = mongoose.model('users');
 
 // User Login Route
 router.get('/login', (req, res)=>{
@@ -35,10 +38,43 @@ router.post('/register', (req, res)=>{
 			password2: req.body.password2
 		});
 	} else{
-		res.send('passed');
+		// Check if email has been used
+		User.findOne({email: req.body.email})
+			.then(user=>{
+				if(user){
+					req.flash('error_msg', 'Email already registered');
+					res.redirect('/users/register');
+				} else{
+					// New User Object from our register form
+					const newUser = new User({
+						name: req.body.name,
+						email: req.body.email,
+						password: req.body.password
+					});
+					// Create a salt
+					// (number characters, callback)
+					bcrypt.genSalt(10, (err, salt)=>{
+						// Create a hash
+						bcrypt.hash(newUser.password, salt, (err, hash)=>{
+							if(err) throw err;
+							// Set the password to the new hash
+							newUser.password = hash;
+							// Save the new user:
+							newUser.save()
+								.then(user=>{
+									req.flash('succes_msg', 'You are now registered');
+									res.redirect('/users/login');
+								})
+								.catch(err=>{
+									console.log(err);
+									return;
+								})
+						});
+					});
+				}
+		});
 	}
 });
-
 
 // Export the Router to have access from other files
 module.exports = router;
