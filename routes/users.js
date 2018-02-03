@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-// const passport = require('passport');
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 // Load User Model
@@ -17,6 +17,19 @@ router.get('/login', (req, res)=>{
 // User Register Route
 router.get('/register', (req, res)=>{
 	res.render('users/register');
+});
+
+// Login Form POST
+router.post('/login', (req, res, next)=>{
+	// Call passport instead our own custom functionality
+	// Authenticate take name of the strategy
+	passport.authenticate('local', {
+		successRedirect: '/ideas',
+		failureRedirect: '/users/login',
+		// Show messages
+		failureFlash: true
+	// To automatically fire up:
+	})(req, res, next);
 });
 
 // Register Form POST
@@ -62,7 +75,7 @@ router.post('/register', (req, res)=>{
 							// Save the new user:
 							newUser.save()
 								.then(user=>{
-									req.flash('succes_msg', 'You are now registered');
+									req.flash('success_msg', 'You are now registered');
 									res.redirect('/users/login');
 								})
 								.catch(err=>{

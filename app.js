@@ -1,19 +1,13 @@
-// Bring Express Module
+// Bring Modules
 const express = require('express');
-// Bring Path Module - No installation needed (Core JS Module)
-// To do things with paths, like join them
+// Path Module - No installation needed (Core JS Module)
 const path = require('path');
-// Bring Handlebars Module
 const exphbs  = require('express-handlebars');
-// Body Parser Module
 const bodyParser = require('body-parser');
-// Method Override
 const methodOverride = require('method-override');
-// Flash Module
 const flash = require('connect-flash');
-// Session Module
 const session = require('express-session')
-// Mongoose Module
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 
@@ -23,6 +17,9 @@ const app = express();
 // Load Routes
 const ideas = require('./routes/ideas');
 const users = require('./routes/users');
+
+// Passport Config
+require('./config/passport')(passport); 
 
 // Connect to mongoose
 // Starting with just local DB
@@ -65,6 +62,9 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
 }));
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Flash Middleware
 app.use(flash());
@@ -74,6 +74,8 @@ app.use((req, res, next)=>{
 	res.locals.success_msg = req.flash('success_msg');
 	res.locals.error_msg = req.flash('error_msg');
 	res.locals.error = req.flash('error');
+	// When you log in you have access to req.user - NULL if it's not there
+	res.locals.user = req.user || null;
 	next();
 });
 // About Route
