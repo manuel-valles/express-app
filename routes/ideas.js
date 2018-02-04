@@ -1,9 +1,9 @@
-// Bring Express
+// Import Modules
 const express = require('express');
-// Bring the Router from Express
 const router = express.Router();
-// Mongoose Module
 const mongoose = require('mongoose');
+// Bring just the function from auth.js
+const {ensureAuthenticated} = require('../helpers/auth');
 
 
 // Load Idea Model
@@ -14,7 +14,7 @@ const Idea = mongoose.model('ideas');
 // Since we moved Routes to here we changed app to router
 // I.e. app.get to router.get
 // Idea Index Route
-router.get('/', (req, res)=>{
+router.get('/', ensureAuthenticated, (req, res)=>{
 	Idea.find({})
 		.sort({date: 'desc'})
 		.then(ideas=>{
@@ -25,12 +25,12 @@ router.get('/', (req, res)=>{
 })
 
 // Add Idea Form - Route
-router.get('/add', (req, res)=>{
+router.get('/add', ensureAuthenticated, (req, res)=>{
 	res.render('ideas/add');
 });
 
 // Edit Idea Form - Route
-router.get('/edit/:id', (req, res)=>{
+router.get('/edit/:id', ensureAuthenticated, (req, res)=>{
 	Idea.findOne({
 		_id: req.params.id
 	})
@@ -43,7 +43,7 @@ router.get('/edit/:id', (req, res)=>{
 });
 
 // Process Form
-router.post('/', (req, res)=>{
+router.post('/', ensureAuthenticated, (req, res)=>{
 	// Validation
 	let errors = [];
 
@@ -75,7 +75,7 @@ router.post('/', (req, res)=>{
 });
 
 // Edit Idea Form Process
-router.put('/:id', (req, res)=>{
+router.put('/:id', ensureAuthenticated, (req, res)=>{
 	Idea.findOne({
 		_id: req.params.id
 	})
@@ -93,7 +93,7 @@ router.put('/:id', (req, res)=>{
 });
 
 // Delete Idea 
-router.delete('/:id', (req, res)=>{
+router.delete('/:id', ensureAuthenticated, (req, res)=>{
 	Idea.remove({_id: req.params.id})
 		.then(()=>{
 			// Add message
