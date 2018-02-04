@@ -21,9 +21,11 @@ const users = require('./routes/users');
 // Passport Config
 require('./config/passport')(passport); 
 
+// DB COnfig
+const db = require('./config/database');
 // Connect to mongoose
 // Starting with just local DB
-mongoose.connect('mongodb://localhost/express-dev')
+mongoose.connect(db.mongoURI)
 .then(()=>{console.log('MongoDB Connected...')})
 .catch(err => console.log(err));
 
@@ -90,7 +92,7 @@ app.use('/ideas', ideas);
 app.use('/users', users);
 
 // Port Varibale
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 // Listen in certain port and a callback function
 app.listen(port, ()=>{
